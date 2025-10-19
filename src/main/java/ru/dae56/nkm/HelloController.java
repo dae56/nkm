@@ -1,29 +1,27 @@
 package ru.dae56.nkm;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class HelloController {
     static ContextMenu currentContextMenu;
+
+    static StackPane nodeFrom = null; // Для хранения первого узла при создании связи
 
     @FXML
     private ResourceBundle resources;
@@ -132,20 +130,34 @@ public class HelloController {
 
         static void initContextMenu(AnchorPane AnchorPane, StackPane circleContainer) {
             circleContainer.setOnMouseClicked(event -> {
-                if (event.getButton() == MouseButton.SECONDARY && (event.getTarget().equals(circleContainer.getChildren().getFirst()) || event.getTarget().equals(circleContainer.getChildren().get(1)))) {
+                if (event.getButton() == MouseButton.SECONDARY) {
                     ContextMenu contextMenu = new ContextMenu();
 
                     MenuItem delete = new MenuItem("Delete");
-                    MenuItem addLinkage = new MenuItem("Add Linkage");
+                    MenuItem addLinkageItem = new MenuItem("Add Linkage");
 
-                    delete.setOnAction(e -> {deleteNode(AnchorPane, circleContainer);});
-                    addLinkage.setOnAction(e -> {addLinkage(AnchorPane, circleContainer);});
+                    delete.setOnAction(e -> deleteNode(AnchorPane, circleContainer));
 
-                    contextMenu.getItems().addAll(delete);
+                    addLinkageItem.setOnAction(e -> {
+                        nodeFrom = circleContainer;
+                        ((Circle) nodeFrom.getChildren().get(0)).setStroke(Color.RED);
+                    });
 
-                    if (currentContextMenu != null) {currentContextMenu.hide();}
+                    contextMenu.getItems().addAll(delete, addLinkageItem);
+
+                    if (currentContextMenu != null) { currentContextMenu.hide(); }
                     currentContextMenu = contextMenu;
                     contextMenu.show(circleContainer, event.getScreenX(), event.getScreenY());
+                }
+                else if (event.getButton() == MouseButton.PRIMARY) {
+                    // Если выбран первый узел, создаем связь к этому узлу
+                    if (nodeFrom != null && nodeFrom != circleContainer) {
+                        addLinkage(AnchorPane, nodeFrom, circleContainer);
+
+                        // Сброс выделения
+                        ((Circle) nodeFrom.getChildren().get(0)).setStroke(Color.BLACK);
+                        nodeFrom = null;
+                    }
                 }
             });
         }
@@ -154,8 +166,103 @@ public class HelloController {
             AnchorPane.getChildren().remove(circleContainer);
         }
 
-        static void addLinkage(AnchorPane AnchorPane, StackPane circleContainerFrom) {
+        static void addLinkage(AnchorPane AnchorPane, StackPane nodeFrom, StackPane nodeTo) {
+            TextInputDialog dialog = new TextInputDialog("0.5");
+            dialog.setTitle("Set Link Weight");
+            dialog.setHeaderText("Enter weight for this link (-1 to 1):");
+            dialog.setContentText("Weight:");
 
+            dialog.showAndWait().ifPresent(input -> {
+                double weight;
+                try {
+                    weight = Double.parseDouble(input);
+                    if (weight < -1 || weight > 1) throw new NumberFormatException();
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid weight. Must be between -1 and 1.");
+                    return;
+                }
+                new Link(AnchorPane, nodeFrom, nodeTo, weight);
+            });
+        }
+    }
+
+    public static class Link {
+        private final StackPane from;
+        private final StackPane to;
+        private final Line line;
+        private final Polygon arrow;
+        private final Text weightText;
+        private final double weight;
+
+        public Link(AnchorPane parent, StackPane from, StackPane to, double weight) {
+            this.from = from;
+            this.to = to;
+            this.weight = weight;
+
+            line = new Line();
+            line.setStroke(Color.BLACK);
+            line.setStrokeWidth(2);
+            if (weight < 0) {
+                line.getStrokeDashArray().addAll(10.0, 5.0);
+            }
+
+            arrow = new Polygon();
+            arrow.setFill(Color.BLACK);
+            weightText = new Text(String.valueOf(weight));
+            weightText.setFill(Color.BLUE);
+            // Добавляем в контейнер до подписки, чтобы сразу было видно
+            parent.getChildren().addAll(line, arrow, weightText);
+            // Подписываемся на изменение координат обоих узлов
+            InvalidationListener updater = obs -> updatePositions();
+            from.layoutXProperty().addListener(updater);
+            from.layoutYProperty().addListener(updater);
+            to.layoutXProperty().addListener(updater);
+            to.layoutYProperty().addListener(updater);
+            // Первоначальное обновление
+            updatePositions();
+        }
+
+        private void updatePositions() {
+            Circle circleFrom = (Circle) from.getChildren().get(0);
+            Circle circleTo = (Circle) to.getChildren().get(0);
+
+            double rFrom = circleFrom.getRadius();
+            double rTo = circleTo.getRadius();
+
+            double x1 = from.getLayoutX() + rFrom;
+            double y1 = from.getLayoutY() + rFrom;
+            double x2 = to.getLayoutX() + rTo;
+            double y2 = to.getLayoutY() + rTo;
+
+            // Вычисляем угол
+            double angle = Math.atan2(y2 - y1, x2 - x1);
+            // Смещаем начало и конец на радиусы, чтобы линия касалась краёв
+            double startX = x1 + Math.cos(angle) * rFrom;
+            double startY = y1 + Math.sin(angle) * rFrom;
+            double endX = x2 - Math.cos(angle) * rTo;
+            double endY = y2 - Math.sin(angle) * rTo;
+
+            line.setStartX(startX);
+            line.setStartY(startY);
+            line.setEndX(endX);
+            line.setEndY(endY);
+            // Рисуем стрелку
+            double arrowLength = 10;
+            double arrowWidth = 7;
+            arrow.getPoints().setAll(
+                    endX, endY,
+                    endX - arrowLength * Math.cos(angle - Math.PI / 6), endY - arrowLength * Math.sin(angle - Math.PI / 6),
+                    endX - arrowLength * Math.cos(angle + Math.PI / 6), endY - arrowLength * Math.sin(angle + Math.PI / 6)
+            );
+            // Текст веса — по центру линии
+            double textX = (startX + endX) / 2;
+            double textY = (startY + endY) / 2 - 10;
+            weightText.setX(textX);
+            weightText.setY(textY);
+        }
+
+        public double getWeight() {
+            return weight;
         }
     }
 }
