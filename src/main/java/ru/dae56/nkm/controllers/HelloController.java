@@ -146,6 +146,12 @@ public class HelloController {
     }
 
     public static void addLinkage(AnchorPane parent, GraphNode from, GraphNode to) {
+        for (GraphLink link : allLinks) {
+            if (link.getFrom() == from && link.getTo() == to) {
+                showInfo("Связь между этими узлами уже существует.");
+                return;
+            }
+        }
         TextInputDialog dialog = new TextInputDialog("0.5");
         dialog.setTitle("Вес связи");
         dialog.setHeaderText("Введите вес (-1 до 1):");
@@ -160,6 +166,7 @@ public class HelloController {
             }
         });
     }
+
 
     private GraphMemento saveState() {
         List<GraphMemento.NodeState> nodeStates = new ArrayList<>();
