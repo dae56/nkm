@@ -21,6 +21,19 @@ public class GraphLink {
     private final double weight;
     private final AnchorPane parent;
 
+    public Line getLine() {
+        return line;
+    }
+
+    public Polygon getArrow() {
+        return arrow;
+    }
+
+    public Text getWeightText() {
+        return weightText;
+    }
+
+
     public GraphLink(AnchorPane parent, GraphNode from, GraphNode to, double weight) {
         this.parent = parent;
         this.from = from;

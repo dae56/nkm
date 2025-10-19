@@ -76,9 +76,17 @@ public class GraphNode {
 
                 MenuItem delete = new MenuItem("Удалить");
                 delete.setOnAction(e -> {
-                    HelloController.getAllLinks().removeIf(link ->
-                            link.getFrom() == this || link.getTo() == this
-                    );
+                    HelloController.getAllLinks().removeIf(link -> {
+                        if (link.getFrom() == this || link.getTo() == this) {
+                            parent.getChildren().removeAll(
+                                    link.getLine(),
+                                    link.getArrow(),
+                                    link.getWeightText()
+                            );
+                            return true;
+                        }
+                        return false;
+                    });
                     parent.getChildren().remove(container);
                 });
 
