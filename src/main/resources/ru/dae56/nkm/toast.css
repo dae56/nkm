@@ -1,0 +1,27 @@
+.toast-info, .toast-success, .toast-warning, .toast-error {
+    -fx-text-fill: white;
+    -fx-padding: 15 25;
+    -fx-background-radius: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+    -fx-content-display: center;
+    -fx-text-alignment: center;
+}
+
+.toast-info {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+}
+
+.toast-success {
+    -fx-background-color: linear-gradient(to right, #48bb78, #38a169);
+}
+
+.toast-warning {
+    -fx-background-color: linear-gradient(to right, #ed8936, #dd6b20);
+}
+
+.toast-error {
+    -fx-background-color: linear-gradient(to right, #f56565, #e53e3e);
+}

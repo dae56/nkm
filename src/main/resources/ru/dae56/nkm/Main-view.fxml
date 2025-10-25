@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="MainBorder" maxHeight="800.0" maxWidth="1200.0" minHeight="800.0" minWidth="1200.0" prefHeight="800.0" prefWidth="1200.0" stylesheets="@mainWindow.css" xmlns="http://javafx.com/javafx/20.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.dae56.nkm.HelloController">
+<BorderPane fx:id="MainBorder" maxHeight="800.0" maxWidth="1200.0" minHeight="800.0" minWidth="1200.0" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/20.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.dae56.nkm.HelloController">
    <center>
       <ScrollPane fx:id="FrontScrollPane" hvalue="0.5" prefHeight="200.0" prefWidth="200.0" vvalue="0.5" BorderPane.alignment="CENTER">
          <stylesheets>
@@ -23,38 +23,47 @@
             <String fx:value="scroll-pane" />
          </styleClass>
          <content>
-               <AnchorPane fx:id="AnchorPane" prefHeight="10000.0" prefWidth="10000.0" />
+               <AnchorPane fx:id="anchorPane" prefHeight="2000.0" prefWidth="2000.0" />
          </content>
       </ScrollPane>
    </center>
    <right>
-      <VBox prefHeight="800.0" prefWidth="350.0" styleClass="tiles-content" stylesheets="@tilesContainer.css" BorderPane.alignment="CENTER">
+      <VBox fx:id="rightPannel" prefHeight="800.0" prefWidth="350.0" styleClass="tiles-content" stylesheets="@tilesContainer.css" BorderPane.alignment="CENTER">
          <children>
-            <VBox prefHeight="200.0" prefWidth="40.0" styleClass="hbox-style" stylesheets="@tile.css">
+            <VBox fx:id="createPanel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="hbox-style" stylesheets="@tile.css">
                <children>
                   <TextField fx:id="TextFieldNodeName" promptText="Enter Node name" styleClass="text-field-primary" stylesheets="@textField.css" />
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Button fx:id="ButtonAddNode" mnemonicParsing="false" onAction="#addNode" styleClass="button-primary" stylesheets="@headButton.css" text="Add Node" textAlignment="JUSTIFY">
                            <HBox.margin>
-                              <Insets top="10.0" />
+                              <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                            </HBox.margin>
                         </Button>
-                        <Button fx:id="ButtonRemoveNode" mnemonicParsing="false" onAction="#removeNode" styleClass="button-primary" stylesheets="@headButton.css" text="Remove Node" textAlignment="JUSTIFY">
+                        <Button fx:id="ButtonRemoveNode" mnemonicParsing="false" onAction="#removeNode" styleClass="button-primary" stylesheets="@headButton.css" text="Remove Node" textAlignment="JUSTIFY" textOverrun="CLIP">
                            <HBox.margin>
-                              <Insets top="10.0" />
+                              <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                            </HBox.margin>
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
                         </Button>
-                     </children></HBox>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </HBox>
                </children>
             </VBox>
             <VBox prefHeight="200.0" prefWidth="100.0" />
          </children>
          <BorderPane.margin>
-            <Insets left="10.0" />
+            <Insets left="20.0" />
          </BorderPane.margin></VBox>
    </right>
+   <stylesheets>
+      <URL value="@mainWindow.css" />
+      <URL value="@node.css" />
+      <URL value="@toast.css" />
+   </stylesheets>
 </BorderPane>
