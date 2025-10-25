@@ -1,0 +1,4 @@
+.root {
+    -fx-background-color: linear-gradient(to bottom, #f5f7fa 0%, #c3cfe2 100%);
+    -fx-padding: 20;
+}

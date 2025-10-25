@@ -1,0 +1,19 @@
+.button-secondary {
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-text-fill: #667eea;
+    -fx-background-radius: 10;
+    -fx-padding: 12 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 6, 0, 0, 2);
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-border-radius: 10;
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+.button-secondary:hover {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 3);
+    -fx-text-fill: #764ba2;
+}

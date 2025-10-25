@@ -1,0 +1,18 @@
+.text-field-primary {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #cbd5e0;
+    -fx-border-width: 2;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: #2d3748;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);
+    -fx-prompt-text-fill: #a0aec0;
+}
+
+.text-field-primary:focused {
+    -fx-border-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-effect: dropshadow(three-pass-box, rgba(102,126,234,0.15), 8, 0, 0, 3);
+    -fx-background-color: white;
+}
