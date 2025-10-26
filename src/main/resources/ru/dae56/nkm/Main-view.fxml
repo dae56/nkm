@@ -4,6 +4,7 @@
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -28,19 +29,19 @@
       </ScrollPane>
    </center>
    <right>
-      <VBox fx:id="rightPannel" prefHeight="800.0" prefWidth="350.0" styleClass="tiles-content" stylesheets="@tilesContainer.css" BorderPane.alignment="CENTER">
+      <VBox fx:id="rightPannel" prefHeight="760.0" prefWidth="380.0" styleClass="tiles-content" stylesheets="@tilesContainer.css" BorderPane.alignment="CENTER">
          <children>
             <VBox fx:id="createPanel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="hbox-style" stylesheets="@tile.css">
                <children>
                   <TextField fx:id="TextFieldNodeName" promptText="Enter Node name" styleClass="text-field-primary" stylesheets="@textField.css" />
-                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                  <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                      <children>
-                        <Button fx:id="ButtonAddNode" mnemonicParsing="false" onAction="#addNode" styleClass="button-primary" stylesheets="@headButton.css" text="Add Node" textAlignment="JUSTIFY">
+                        <Button fx:id="ButtonAddNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addNode" styleClass="button-primary" stylesheets="@headButton.css" text="Add Node" textAlignment="JUSTIFY">
                            <HBox.margin>
                               <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                            </HBox.margin>
                         </Button>
-                        <Button fx:id="ButtonRemoveNode" mnemonicParsing="false" onAction="#removeNode" styleClass="button-primary" stylesheets="@headButton.css" text="Remove Node" textAlignment="JUSTIFY" textOverrun="CLIP">
+                        <Button fx:id="ButtonRemoveNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeNode" styleClass="button-primary" stylesheets="@headButton.css" text="Remove Node" textAlignment="JUSTIFY" textOverrun="CLIP">
                            <HBox.margin>
                               <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                            </HBox.margin>
@@ -52,10 +53,46 @@
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
                   </HBox>
                </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
             </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0" />
+            <VBox prefHeight="162.0" prefWidth="330.0" styleClass="hbox-style" stylesheets="@tile.css">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+               <children>
+                  <ComboBox fx:id="ComboBoxFrom" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="From" styleClass="combo-box-primary" stylesheets="@comboBox.css" visibleRowCount="100">
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
+                  </ComboBox>
+                  <ComboBox fx:id="ComboBoxTo" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="To" styleClass="combo-box-primary" stylesheets="@comboBox.css" visibleRowCount="100">
+                     <VBox.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                     </VBox.margin>
+                  </ComboBox>
+                  <TextField fx:id="TextFieldWeightLinkage" promptText="Weight" styleClass="text-field-primary" stylesheets="@textField.css" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="AddLinkageButton" mnemonicParsing="false" onAction="#addLinkage" styleClass="button-primary" stylesheets="@headButton.css" text="Add Linkage">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="RemoveLinkageButton" mnemonicParsing="false" onAction="#removeLinkage" styleClass="button-primary" stylesheets="@headButton.css" text="Remove Linkage">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children></VBox>
          </children>
          <BorderPane.margin>
             <Insets left="20.0" />

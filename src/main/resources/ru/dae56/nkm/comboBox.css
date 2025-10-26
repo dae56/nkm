@@ -1,0 +1,94 @@
+/* Стиль для ComboBox в стиле text-field-primary */
+.combo-box-primary {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #cbd5e0;
+    -fx-border-width: 2;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: #2d3748;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 4, 0, 0, 2);
+}
+
+/* Стиль при наведении */
+.combo-box-primary:hover {
+    -fx-background-color: white;
+    -fx-border-color: #a0aec0;
+}
+
+/* Стиль когда ComboBox открыт */
+.combo-box-primary:showing {
+    -fx-border-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-effect: dropshadow(three-pass-box, rgba(102,126,234,0.15), 8, 0, 0, 3);
+    -fx-background-color: white;
+}
+
+/* Стиль стрелки */
+.combo-box-primary .arrow {
+    -fx-background-color: #667eea;
+    -fx-padding: 4px;
+    -fx-shape: "M 0 0 L 4 4 L 8 0 Z";
+}
+
+/* Стиль при наведении на стрелку */
+.combo-box-primary:hover .arrow {
+    -fx-background-color: #764ba2;
+}
+
+/* Выпадающий список */
+.combo-box-primary .list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 3);
+    -fx-padding: 5;
+}
+
+/* Элементы списка */
+.combo-box-primary .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+    -fx-text-fill: #2d3748;
+    -fx-border-color: transparent;
+}
+
+/* Элемент списка при наведении */
+.combo-box-primary .list-cell:hover {
+    -fx-background-color: linear-gradient(to right, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+    -fx-text-fill: #2d3748;
+}
+
+/* Выбранный элемент списка */
+.combo-box-primary .list-cell:filled:selected {
+    -fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+    -fx-text-fill: white;
+}
+
+/* Выбранный элемент при наведении */
+.combo-box-primary .list-cell:filled:selected:hover {
+    -fx-background-color: linear-gradient(to right, #5a6fd8, #6a4190);
+    -fx-text-fill: white;
+}
+
+/* Полоса прокрутки в выпадающем списке */
+.combo-box-primary .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.combo-box-primary .scroll-bar:vertical .track {
+    -fx-background-color: #f7fafc;
+    -fx-background-radius: 2;
+}
+
+.combo-box-primary .scroll-bar:vertical .thumb {
+    -fx-background-color: #cbd5e0;
+    -fx-background-radius: 2;
+}
+
+.combo-box-primary .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #a0aec0;
+}
