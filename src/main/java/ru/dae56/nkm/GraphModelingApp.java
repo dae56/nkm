@@ -31,6 +31,7 @@ public class GraphModelingApp extends Application {
     private GraphVisualization graphVisualization = new GraphVisualization();
     private ObservableList<String> nodeList = FXCollections.observableArrayList();
     private List<XYChart.Series<Number, Number>> impulseSeries = new ArrayList<>();
+    private Map<String, double[]> currentImpulseResults = new HashMap<>();
 
     // UI components
     private ListView<String> nodesListView;
@@ -364,6 +365,7 @@ public class GraphModelingApp extends Application {
         refreshImpulseTable();
         cyclesTextArea.clear();
         impulseChart.getData().clear();
+        currentImpulseResults.clear();
     }
 
     private void saveGraph() {
@@ -398,6 +400,7 @@ public class GraphModelingApp extends Application {
                 refreshImpulseTable();
                 cyclesTextArea.clear();
                 impulseChart.getData().clear();
+                currentImpulseResults.clear();
                 showAlert("Success", "Graph loaded successfully!");
             } catch (IOException | ClassNotFoundException e) {
                 showAlert("Error", "Failed to load graph: " + e.getMessage());
@@ -468,9 +471,9 @@ public class GraphModelingApp extends Application {
         } else {
             StringBuilder sb = new StringBuilder();
 
-            // Положительные циклы
+            // Положительные циклы (произведение > 0)
             if (!cycleResult.getPositiveCycles().isEmpty()) {
-                sb.append("=== POSITIVE CYCLES ===\n");
+                sb.append("=== POSITIVE CYCLES (Product > 0) ===\n");
                 sb.append("Found ").append(cycleResult.getPositiveCycles().size()).append(" positive cycle(s):\n\n");
                 for (int i = 0; i < cycleResult.getPositiveCycles().size(); i++) {
                     CycleInfo cycle = cycleResult.getPositiveCycles().get(i);
@@ -479,15 +482,15 @@ public class GraphModelingApp extends Application {
                     if (!cycle.getNodes().isEmpty()) {
                         sb.append(" -> ").append(cycle.getNodes().get(0));
                     }
-                    sb.append(" (Total weight: ").append(String.format("%.3f", cycle.getTotalWeight())).append(")");
+                    sb.append(" (Product weight: ").append(String.format("%.6f", cycle.getTotalWeight())).append(")");
                     sb.append("\n");
                 }
                 sb.append("\n");
             }
 
-            // Отрицательные циклы
+            // Отрицательные циклы (произведение < 0)
             if (!cycleResult.getNegativeCycles().isEmpty()) {
-                sb.append("=== NEGATIVE CYCLES ===\n");
+                sb.append("=== NEGATIVE CYCLES (Product < 0) ===\n");
                 sb.append("Found ").append(cycleResult.getNegativeCycles().size()).append(" negative cycle(s):\n\n");
                 for (int i = 0; i < cycleResult.getNegativeCycles().size(); i++) {
                     CycleInfo cycle = cycleResult.getNegativeCycles().get(i);
@@ -496,15 +499,15 @@ public class GraphModelingApp extends Application {
                     if (!cycle.getNodes().isEmpty()) {
                         sb.append(" -> ").append(cycle.getNodes().get(0));
                     }
-                    sb.append(" (Total weight: ").append(String.format("%.3f", cycle.getTotalWeight())).append(")");
+                    sb.append(" (Product weight: ").append(String.format("%.6f", cycle.getTotalWeight())).append(")");
                     sb.append("\n");
                 }
                 sb.append("\n");
             }
 
-            // Нейтральные циклы
+            // Нейтральные циклы (произведение = 0)
             if (!cycleResult.getNeutralCycles().isEmpty()) {
-                sb.append("=== NEUTRAL CYCLES ===\n");
+                sb.append("=== NEUTRAL CYCLES (Product = 0) ===\n");
                 sb.append("Found ").append(cycleResult.getNeutralCycles().size()).append(" neutral cycle(s):\n\n");
                 for (int i = 0; i < cycleResult.getNeutralCycles().size(); i++) {
                     CycleInfo cycle = cycleResult.getNeutralCycles().get(i);
@@ -513,7 +516,7 @@ public class GraphModelingApp extends Application {
                     if (!cycle.getNodes().isEmpty()) {
                         sb.append(" -> ").append(cycle.getNodes().get(0));
                     }
-                    sb.append(" (Total weight: ").append(String.format("%.3f", cycle.getTotalWeight())).append(")");
+                    sb.append(" (Product weight: ").append(String.format("%.6f", cycle.getTotalWeight())).append(")");
                     sb.append("\n");
                 }
                 sb.append("\n");
@@ -546,8 +549,8 @@ public class GraphModelingApp extends Application {
                 return;
             }
 
-            Map<String, double[]> impulseResults = graphModel.runImpulseSimulation(initialImpulses, steps);
-            updateImpulseChart(impulseResults, steps);
+            currentImpulseResults = graphModel.runImpulseSimulation(initialImpulses, steps);
+            updateImpulseChart(currentImpulseResults, steps);
 
         } catch (NumberFormatException e) {
             showAlert("Error", "Please enter a valid number of simulation steps");
@@ -564,11 +567,92 @@ public class GraphModelingApp extends Application {
 
             double[] values = entry.getValue();
             for (int i = 0; i < steps; i++) {
-                series.getData().add(new XYChart.Data<>(i, values[i]));
+                XYChart.Data<Number, Number> dataPoint = new XYChart.Data<>(i, values[i]);
+                series.getData().add(dataPoint);
+
+                // Добавляем Tooltip для каждой точки данных
+                Tooltip tooltip = new Tooltip();
+                tooltip.setText(String.format("Node: %s\nStep: %d\nValue: %.4f",
+                        entry.getKey(), i, values[i]));
+                Tooltip.install(dataPoint.getNode(), tooltip);
             }
 
             impulseChart.getData().add(series);
             impulseSeries.add(series);
+
+            // Добавляем Tooltip для всей линии
+            addSeriesTooltip(series, entry.getKey(), values, steps);
+        }
+    }
+
+    private void addSeriesTooltip(XYChart.Series<Number, Number> series, String nodeName, double[] values, int steps) {
+        // Создаем кастомный Tooltip для всей линии
+        Tooltip seriesTooltip = new Tooltip();
+
+        // Создаем подробное содержимое для Tooltip
+        StringBuilder tooltipContent = new StringBuilder();
+        tooltipContent.append("Node: ").append(nodeName).append("\n\n");
+        tooltipContent.append("Values per step:\n");
+
+        // Добавляем значения для первых 10 шагов (или всех, если меньше)
+        int displaySteps = Math.min(steps, 10);
+        for (int i = 0; i < displaySteps; i++) {
+            tooltipContent.append(String.format("Step %d: %.4f\n", i, values[i]));
+        }
+
+        if (steps > 10) {
+            tooltipContent.append("...\n");
+            // Добавляем последние 5 значений
+            for (int i = steps - 5; i < steps; i++) {
+                tooltipContent.append(String.format("Step %d: %.4f\n", i, values[i]));
+            }
+        }
+
+        // Добавляем статистику
+        double min = Arrays.stream(values).min().orElse(0);
+        double max = Arrays.stream(values).max().orElse(0);
+        double finalValue = values[steps - 1];
+
+        tooltipContent.append("\nStatistics:\n");
+        tooltipContent.append(String.format("Min: %.4f\n", min));
+        tooltipContent.append(String.format("Max: %.4f\n", max));
+        tooltipContent.append(String.format("Final: %.4f", finalValue));
+
+        seriesTooltip.setText(tooltipContent.toString());
+        seriesTooltip.setStyle("-fx-font-family: 'Monospaced'; -fx-font-size: 12px;");
+
+        // Устанавливаем Tooltip для узла серии (линии)
+        series.getNode().setOnMouseEntered(event -> {
+            seriesTooltip.show(series.getNode(), event.getScreenX() + 15, event.getScreenY() + 15);
+        });
+
+        series.getNode().setOnMouseExited(event -> {
+            seriesTooltip.hide();
+        });
+
+        // Также добавляем Tooltip для точек данных при наведении
+        for (XYChart.Data<Number, Number> data : series.getData()) {
+            data.getNode().setOnMouseEntered(event -> {
+                int step = data.getXValue().intValue();
+                double value = data.getYValue().doubleValue();
+
+                Tooltip pointTooltip = new Tooltip();
+                pointTooltip.setText(String.format("Node: %s\nStep: %d\nValue: %.4f",
+                        nodeName, step, value));
+                pointTooltip.setStyle("-fx-font-family: 'Monospaced'; -fx-font-size: 12px;");
+
+                pointTooltip.show(data.getNode(), event.getScreenX() + 15, event.getScreenY() + 15);
+
+                // Сохраняем ссылку на tooltip для последующего скрытия
+                data.getNode().setUserData(pointTooltip);
+            });
+
+            data.getNode().setOnMouseExited(event -> {
+                Tooltip pointTooltip = (Tooltip) data.getNode().getUserData();
+                if (pointTooltip != null) {
+                    pointTooltip.hide();
+                }
+            });
         }
     }
 
@@ -625,7 +709,7 @@ class CycleInfo {
     public double getTotalWeight() { return totalWeight; }
     public boolean isPositive() { return totalWeight > 0; }
     public boolean isNegative() { return totalWeight < 0; }
-    public boolean isNeutral() { return totalWeight == 0; }
+    public boolean isNeutral() { return Math.abs(totalWeight) < 1e-10; } // Учитываем погрешность вычислений
 }
 
 // Класс для хранения результатов анализа циклов
@@ -755,8 +839,8 @@ class GraphModel implements Serializable {
         List<CycleInfo> neutralCycles = new ArrayList<>();
 
         for (List<String> cycle : allCycles) {
-            double totalWeight = calculateCycleWeight(cycle);
-            CycleInfo cycleInfo = new CycleInfo(cycle, totalWeight);
+            double productWeight = calculateCycleProductWeight(cycle);
+            CycleInfo cycleInfo = new CycleInfo(cycle, productWeight);
 
             if (cycleInfo.isPositive()) {
                 positiveCycles.add(cycleInfo);
@@ -770,21 +854,24 @@ class GraphModel implements Serializable {
         return new CycleAnalysisResult(positiveCycles, negativeCycles, neutralCycles);
     }
 
-    private double calculateCycleWeight(List<String> cycle) {
+    private double calculateCycleProductWeight(List<String> cycle) {
         if (cycle.size() < 2) return 0.0;
 
-        double totalWeight = 0.0;
-        // Проходим по всем связям в цикле
+        double product = 1.0;
+        // Проходим по всем связям в цикле и перемножаем веса
         for (int i = 0; i < cycle.size(); i++) {
             String fromNode = cycle.get(i);
             String toNode = cycle.get((i + 1) % cycle.size()); // Замыкаем цикл
 
             GraphNode node = nodes.get(fromNode);
             if (node != null && node.getConnections().containsKey(toNode)) {
-                totalWeight += node.getConnections().get(toNode);
+                product *= node.getConnections().get(toNode);
+            } else {
+                // Если связи нет, произведение становится 0
+                return 0.0;
             }
         }
-        return totalWeight;
+        return product;
     }
 
     private Map<String, List<String>> buildAdjacencyList() {
